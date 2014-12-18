@@ -1,8 +1,9 @@
 /*
- * plusTabs version 1.0.1
+ * plusTabs version 1.1.0
  *
  * Author: Jason Day @iamjasonday - 
  * Forked by Ross Carver to update allowing for todo to display as many tabs as possible before displaying showmore
+ * Forked by Andrea Baita, in order to support jQuery UI 1.10+ 
  *
  * (c) 2012, Jason Day
  *
@@ -65,7 +66,7 @@
               $(this).addClass('fits');       // we'll use this to find only those without fits class below
               sumWidth+= $(this).outerWidth();
             } else {
-              $(this).addClass('notfit');       // we'll use this to find only those without fits class below
+                $(this).addClass('notfit');       // we'll use this to find only those without fits class below                
             }
           });
           
@@ -82,12 +83,19 @@
     	    }
     	    // set active tab width
     	    var seeMoreWidth = $(".seeMore").outerWidth();
+    	    var seeMorePos = $(".seeMore").position();
           var moreActiveTab = ATBwidth - seeMoreWidth - o.sizeTweak;          // width of all minus room for see more tab minus tweaking option
     	    
     	    // position .allTabs
     	    var uiTabsHeight = $uiTabsNav.outerHeight();
     	    var $allTabs = $plusTabs.find(".allTabs");
-    	    $allTabs.css({"top": uiTabsHeight,"width": o.dropWidth});
+    	    $allTabs.css({
+    	        "top": uiTabsHeight,
+    	        left: seeMorePos.left,
+    	        "width": seeMoreWidth,
+    	        "position": "absolute",
+    	        "list-style-type": "none"
+    	    });
           
     	    // Highlight active tab in allTabs dropdown
     	    $allTabs.find("a").removeClass("highlight");
@@ -95,7 +103,7 @@
     	    var selectedText = $uiTabsNav.find("li.ui-state-active a").text();
     	    var allTabsSelected = $allTabs.find('a:contains("' + selectedText + '")');
     	    $plusTabs.find(allTabsSelected).addClass("highlight");
-          
+    	    $allTabs.hide()
     	  } // end function for showActiveTab
         
         
@@ -145,7 +153,7 @@
     	    $uiTabsNav.find('li.notfit').show().clone().click(function (event) // using parent here inherits tab styling
     	    {
             event.preventDefault();                          //stop hash to behavior
-    	      $plusTabs.tabs('select', parseInt($(this).index()+fitTabCount));       // mimic tab select
+    	      $plusTabs.tabs('option', 'active', parseInt($(this).index()+fitTabCount));       // mimic tab select
     	      showActiveTab();                                 // show active tab on selection
     	      $plusTabs.find('.allTabs').slideUp('fast');      //hide "see more tabs"
     	    }).appendTo(allTabsNav);
